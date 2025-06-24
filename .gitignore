@@ -1,0 +1,4 @@
+# excluding FILES
+*secret*
+*.log*
+.vscode
