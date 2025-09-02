@@ -111,11 +111,15 @@ Once everything is connected, do a short test, put the project box on top of the
 
 <table>
   <tr>
-    <td rowspan="2"><img src="images\IMG_20250616_133216.jpg"></td>
-    <td><img src="images\IMG_20250616_134011.jpg"></td>
+    <td rowspan="2" width=50%>Connection:<br>
+      <img src="images\IMG_20250616_133216.jpg"></td>
+    <td>Box placement:<br>
+      <img src="images\IMG_20250616_134011.jpg">
+      <img src="images\IMG_20250616_134428.jpg"></td>
   </tr>
   <tr>
-    <td><img src="images\IMG_20250616_134428.jpg"></td>
+    <td>Open sensor (reed contact J3.1+J3.3):<br>
+      <img src="images\IMG_20250621_173028.jpg"></td>
   </tr>
 </table>
 
