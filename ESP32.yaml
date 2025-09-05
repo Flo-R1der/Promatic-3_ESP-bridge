@@ -1,0 +1,194 @@
+#===== You can edit your configuration in this 'substitution' section =====#
+substitutions:
+  device_name: "garage-rechts"  # only lowercase, numbers, - and _ allowed!
+  friendly_name: "ESP Garage rechts"
+  wifi_ssid: !secret wifi_ssid
+  wifi_password: !secret wifi_password
+  local_domain: ".fritz.box"
+  hotspot_password: !secret hotspot_password
+  ota_password: !secret ota_password
+  api_encryption_key: !secret api_encryption
+
+  # Set the open and close durations of your garage door here (decimal seconds allowed)
+  # Measure the time your garage door needs for a full open/close cycle
+  open_duration: 13.8s
+  close_duration: 14.8s
+
+##### Changes beyond this line may break the functionality #####
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: arduino
+
+status_led:
+  pin: GPIO2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: ${api_encryption_key}
+
+ota:
+  - platform: esphome
+    password: ${ota_password}
+
+wifi:
+  ssid: ${wifi_ssid}
+  password: ${wifi_password}
+
+  domain: ${local_domain}
+  #use_address: 192.168.178.159
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${device_name}
+    password: ${hotspot_password}
+
+captive_portal:
+    
+
+sensor:
+  - platform: wifi_signal # Reports the WiFi signal strength/RSSI in dB
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+    icon: mdi:wifi
+
+  - platform: copy # Reports the WiFi signal strength in %
+    source_id: wifi_signal_db
+    name: "WiFi Signal %"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+    device_class: ""
+    icon: mdi:wifi
+
+
+output:
+  - platform: gpio
+    pin: 
+      number: GPIO26
+    id: gpio_impulse
+
+button:
+  - platform: output
+    id: open_close_impulse
+    output: gpio_impulse
+    duration: 300ms
+
+binary_sensor:
+  - platform: status
+    name: "Status"
+
+  - platform: gpio
+    pin:
+      number: GPIO32
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    name: "${friendly_name} Button"
+    id: external_button
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    on_press:
+      then:
+        - button.press: open_close_impulse
+
+  - platform: gpio
+    pin:
+      number: GPIO12
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: is_opened
+    name: "${friendly_name} open"
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+
+  - platform: gpio
+    pin:
+      number: GPIO33
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: is_closed
+    name: "${friendly_name} closed"
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+
+  - platform: gpio
+    pin:
+      number: GPIO14
+      mode:
+        input: true
+        pullup: true
+    id: motor_opening
+    name: "${friendly_name} opening"
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+      # the voltage of the motor drops at the end to slow down the garage door
+      # which turns off the motor_opening detection and puts the cover in a 
+      # false idle state. The delayed_off: 3000ms time can compensate this behavior, 
+      # but a partial "open" state will return wrong % values.
+
+  - platform: gpio
+    pin:
+      number: GPIO13
+      mode:
+        input: true
+        pullup: true
+    id: motor_closing
+    name: "${friendly_name} closing"
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+      # the voltage of the motor drops at the end to slow down the garage door
+      # which turns off the motor_opening detection and puts the cover in a 
+      # false idle state. The delayed_off: 3300ms time can compensate this behavior, 
+      # but a partial "open" state will return wrong % values.
+
+cover:
+  - platform: feedback
+    name: ${friendly_name}
+    device_class: garage
+    icon: "mdi:garage"
+    
+    has_built_in_endstop: true
+    direction_change_wait_time: 500ms
+
+    open_action:
+      - button.press: open_close_impulse
+    open_duration: ${open_duration}
+    open_endstop: is_opened
+    open_sensor: motor_opening
+
+    close_action:
+      - button.press: open_close_impulse
+    close_duration: ${close_duration}
+    close_endstop: is_closed
+    close_sensor: motor_closing
+
+    stop_action:
+      - button.press: open_close_impulse
