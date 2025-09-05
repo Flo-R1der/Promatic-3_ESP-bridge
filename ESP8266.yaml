@@ -9,6 +9,8 @@ substitutions:
   ota_password: !secret ota_password
   api_encryption_key: !secret api_encryption
 
+  # Set the open and close durations of your garage door here (decimal seconds allowed)
+  # Measure the time your garage door needs for a full open/close cycle
   open_duration: 16.5s
   close_duration: 17.5s
 
@@ -51,6 +53,25 @@ wifi:
 captive_portal:
     
 
+sensor:
+  - platform: wifi_signal # Reports the WiFi signal strength/RSSI in dB
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+    icon: mdi:wifi
+
+  - platform: copy # Reports the WiFi signal strength in %
+    source_id: wifi_signal_db
+    name: "WiFi Signal %"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+    device_class: ""
+    icon: mdi:wifi
+
+
 output:
   - platform: gpio
     pin: 
@@ -64,6 +85,10 @@ button:
     duration: 300ms
 
 binary_sensor:
+  - platform: status
+    name: "Status"
+
+
   - platform: gpio
     pin:
       number: GPIO5
@@ -120,10 +145,11 @@ binary_sensor:
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
-      - delayed_off: 3000ms
+      - delayed_off: 50ms
       # the voltage of the motor drops at the end to slow down the garage door
       # which turns off the motor_opening detection and puts the cover in a 
-      # false idle state. The delayed_off time should compensate this behaviour.
+      # false idle state. The delayed_off: 3000ms time can compensate this behavior, 
+      # but a partial "open" state will return wrong % values.
 
   - platform: gpio
     pin:
@@ -136,10 +162,11 @@ binary_sensor:
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
-      - delayed_off: 3300ms
+      - delayed_off: 50ms
       # the voltage of the motor drops at the end to slow down the garage door
       # which turns off the motor_opening detection and puts the cover in a 
-      # false idle state. The delayed_off time should compensate this behaviour.
+      # false idle state. The delayed_off: 3300ms time can compensate this behavior, 
+      # but a partial "open" state will return wrong % values.
 
 cover:
   - platform: feedback
