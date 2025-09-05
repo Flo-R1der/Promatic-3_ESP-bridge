@@ -32,7 +32,7 @@ This project is made to integrate the Hörmann Promatic 3 garage door drive unit
  A housing is also recommended since the PCB does not fit in the Promatic 3 housing. As reference: I'm using these [project boxes](https://www.amazon.de/dp/B0BWLW941S)
 
 
-## Option 1: ESP8266
+## Option 1: ESP8266 D1 mini
 <details>
 <summary>For basic functionalities the ESP8266 is totally suitable</summary>
 
@@ -57,9 +57,9 @@ Grid PCB: 70 x 50 mm / 24 x 18 holes / resistors vertical to save space
 </details>
 
 
-## Option 2: ESP32 mini
+## Option 2: ESP32 D1 mini
 <details>
-<summary>For extended functionalities the ESP32 mini is the better option</summary>
+<summary>For extended functionalities the ESP32 is the better option</summary>
 
 ### Circuit Diagram
 ![ESP32-mini circuit diagram](images/ESP32-mini_circuit-diagram.svg)
@@ -67,13 +67,16 @@ Grid PCB: 70 x 50 mm / 24 x 18 holes / resistors vertical to save space
 ### PCB-Design
 <img src="images\ESP32-mini_PCB.png" width=500px>
 
-If you like to order the PCB shown above, feel free to use the already exported production files. Or implement changes using **[fritzing](https://fritzing.org/download)** (check the [ESP32-mini Pinout Reference](https://www.esp32learning.com/micropython/mh-et-live-minikit-for-esp32-and-micropython.php)!):
-- **PCB-Design**: [ESP32-mini_extended-gerber.zip](ESP32-mini_extended-gerber.zip) (78,8 x 55,9mm)
-- **Project File**: [ESP32-mini.fzz](ESP8266.fzz)
+If you like to order the PCB shown above, feel free to use the already exported production files. Or implement changes using **[fritzing](https://fritzing.org/download)** (check the [ESP32-mini Pinout Reference](https://www.espboards.dev/esp32/d1-mini32/)!):
+- **PCB-Design**: [ESP32-mini_extended-gerber.zip](ESP32-mini_extended-gerber.zip) (78,7 x 54,6mm)
+- **Project File**: [ESP32-mini.fzz](ESP32-mini.fzz)
 
-### Results
-// FIXME
+### Results (Prototype)
 
+I ordered a PCB and tried to do the soldering. Unfortunately there were some issues, that are resolved now in the ESP8266 and ESP32 PCB files (see commit 4a13bd1397be6c67168064e2b9723a02679394e2 for details)
+
+<img src="images\ESP32_prototype-PCB_top.jpg" width=300px>
+<img src="images\ESP32_prototype-PCB_bottom.jpg" width=300px>
 
 </details>
 
@@ -114,7 +117,7 @@ Once everything is connected, do a short test, put the project box on top of the
     <td rowspan="2" width=50%>Connection:<br>
       <img src="images\IMG_20250616_133216.jpg"></td>
     <td>Box placement:<br>
-      <img src="images\IMG_20250616_134011.jpg">
+      <img src="images\IMG_20250616_134011.jpg"><br>
       <img src="images\IMG_20250616_134428.jpg"></td>
   </tr>
   <tr>
