@@ -80,14 +80,15 @@ output:
 
 button:
   - platform: output
+    name: "Manual Trigger"
     id: open_close_impulse
+    disabled_by_default: true
     output: gpio_impulse
     duration: 300ms
 
 binary_sensor:
   - platform: status
     name: "Status"
-
 
   - platform: gpio
     pin:
@@ -96,7 +97,7 @@ binary_sensor:
         input: true
         pullup: true
       inverted: true
-    name: "${friendly_name} Button"
+    name: "External Button"
     id: external_button
     disabled_by_default: true
     filters:
@@ -114,7 +115,7 @@ binary_sensor:
         pullup: true
       inverted: true
     id: is_opened
-    name: "${friendly_name} open"
+    name: "open"
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
@@ -128,7 +129,7 @@ binary_sensor:
         pullup: true
       inverted: true
     id: is_closed
-    name: "${friendly_name} closed"
+    name: "closed"
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
@@ -141,7 +142,7 @@ binary_sensor:
         input: true
         pullup: true
     id: motor_opening
-    name: "${friendly_name} opening"
+    name: "opening"
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
@@ -158,7 +159,7 @@ binary_sensor:
         input: true
         pullup: true
     id: motor_closing
-    name: "${friendly_name} closing"
+    name: "closing"
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
@@ -170,7 +171,7 @@ binary_sensor:
 
 cover:
   - platform: feedback
-    name: ${friendly_name}
+    name: ''
     device_class: garage
     icon: "mdi:garage"
     

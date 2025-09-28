@@ -1,7 +1,7 @@
 #===== You can edit your configuration in this 'substitution' section =====#
 substitutions:
   device_name: "garage-rechts"  # only lowercase, numbers, - and _ allowed!
-  friendly_name: "ESP Garage rechts"
+  friendly_name: "Garage rechts"
   wifi_ssid: !secret wifi_ssid
   wifi_password: !secret wifi_password
   local_domain: ".fritz.box"
@@ -97,7 +97,7 @@ binary_sensor:
         input: true
         pullup: true
       inverted: true
-    name: "${friendly_name} Button"
+    name: "Button"
     id: external_button
     disabled_by_default: true
     filters:
@@ -115,7 +115,7 @@ binary_sensor:
         pullup: true
       inverted: true
     id: is_opened
-    name: "${friendly_name} open"
+    name: "open"
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
@@ -129,7 +129,7 @@ binary_sensor:
         pullup: true
       inverted: true
     id: is_closed
-    name: "${friendly_name} closed"
+    name: "closed"
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
@@ -142,7 +142,7 @@ binary_sensor:
         input: true
         pullup: true
     id: motor_opening
-    name: "${friendly_name} opening"
+    name: "opening"
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
@@ -159,7 +159,7 @@ binary_sensor:
         input: true
         pullup: true
     id: motor_closing
-    name: "${friendly_name} closing"
+    name: "closing"
     disabled_by_default: true
     filters:
       - delayed_on: 50ms
@@ -171,7 +171,7 @@ binary_sensor:
 
 cover:
   - platform: feedback
-    name: ${friendly_name}
+    name: ''
     device_class: garage
     icon: "mdi:garage"
     
