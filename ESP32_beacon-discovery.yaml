@@ -1,0 +1,62 @@
+#===== You can edit your configuration in this 'substitution' section =====#
+substitutions:
+  device_name: "garage-rechts"  # only lowercase, numbers, - and _ allowed!
+  friendly_name: "Garage rechts"
+  wifi_ssid: !secret wifi_ssid
+  wifi_password: !secret wifi_password
+  local_domain: ".fritz.box"
+  hotspot_password: !secret hotspot_password
+  ota_password: !secret ota_password
+  api_encryption_key: !secret api_encryption
+
+  # Set the open and close durations of your garage door here (decimal seconds allowed)
+  # Measure the time your garage door needs for a full open/close cycle
+  open_duration: 13.8s
+  close_duration: 14.8s
+
+  # BLE Beacon settings
+  ble_beacon_mac: !secret ble_beacon_mac_1
+
+##### Changes beyond this line may break the functionality #####
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: arduino
+
+status_led:
+  pin: GPIO2
+
+# Enable logging
+logger:
+  baud_rate: 0
+  level: VERY_VERBOSE
+
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: ${api_encryption_key}
+
+ota:
+  - platform: esphome
+    password: ${ota_password}
+
+wifi:
+  ssid: ${wifi_ssid}
+  password: ${wifi_password}
+
+  domain: ${local_domain}
+  #use_address: 192.168.178.188
+  
+
+esp32_ble_tracker:
+
+text_sensor:
+  - platform: ble_scanner
+    name: "BLE Devices Scanner"
+
