@@ -54,9 +54,6 @@ wifi:
   
 
 esp32_ble_tracker:
-  
-bluetooth_proxy:
-
 
 
 sensor:
@@ -188,7 +185,17 @@ binary_sensor:
     name: "BLE-Beacon Present"
     id: ble_beacon_presence
     on_press:
-      - button.press: open_close_impulse
+      if:
+        condition:
+          - lambda: 'return !(id(cover_entity).position != COVER_OPEN);'
+        then:
+          - cover.open: cover_entity
+    on_release:
+      if:
+        condition:
+          - lambda: 'return !(id(cover_entity).position != COVER_CLOSED);'
+        then:
+          - cover.close: cover_entity
 
 
 cover:
@@ -196,6 +203,7 @@ cover:
     name: ''
     device_class: garage
     icon: "mdi:garage"
+    id: cover_entity
     
     has_built_in_endstop: true
     direction_change_wait_time: 500ms
