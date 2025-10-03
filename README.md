@@ -64,21 +64,21 @@ Grid PCB: 70 x 50 mm / 24 x 18 holes / resistors vertical to save space
 > **WARNING**: While flashing the ESP32 D1 Mini I had some trouble. Please read the information below in the [ESPHome Firmware](#esphome-firmware)-Section.
 
 ### Circuit Diagram
-![ESP32-mini circuit diagram](images/ESP32-mini_circuit-diagram.svg)
+![ESP32-D1-mini circuit diagram](images/ESP32-D1-mini_circuit-diagram.svg)
 
 ### PCB-Design
-<img src="images\ESP32-mini_PCB.png" width=500px>
+<img src="images\ESP32-D1-mini_PCB.png" width=500px>
 
-If you like to order the PCB shown above, feel free to use the already exported production files. Or implement changes using **[fritzing](https://fritzing.org/download)** (check the [ESP32-mini Pinout Reference](https://www.espboards.dev/esp32/d1-mini32/)!):
-- **PCB-Design**: [ESP32-mini_extended-gerber.zip](ESP32-mini_extended-gerber.zip) (78,7 x 54,6mm)
-- **Project File**: [ESP32-mini.fzz](ESP32-mini.fzz)
+If you like to order the PCB shown above, feel free to use the already exported production files. Or implement changes using **[fritzing](https://fritzing.org/download)** (check the [ESP32-D1-mini Pinout Reference](https://www.espboards.dev/esp32/d1-mini32/)!):
+- **PCB-Design**: [ESP32-D1-mini_extended-gerber.zip](ESP32-D1-mini_extended-gerber.zip) (78,7 x 54,6mm)
+- **Project File**: [ESP32-D1-mini.fzz](ESP32-D1-mini.fzz)
 
 ### Results (Prototype)
 
 I ordered a PCB and tried to do the soldering. Unfortunately there were some issues, that are resolved now in the ESP8266 and ESP32 PCB files (see commit [4a13bd1](../../commit/4a13bd1397be6c67168064e2b9723a02679394e2) and [b1b8725](../../commit/b1b872543b13843ac204b23dd64338c8f80fe5ec) for details)
 
-<img src="images\ESP32_prototype-PCB_top.jpg" width=400px>
-<img src="images\ESP32_prototype-PCB_bottom.jpg" width=400px>
+<img src="images\ESP32-D1-mini_prototype-PCB_top.jpg" width=400px>
+<img src="images\ESP32-D1-mini_prototype-PCB_bottom.jpg" width=400px>
 
 </details>
 
@@ -102,7 +102,7 @@ I ordered a PCB and tried to do the soldering. Unfortunately there were some iss
 
 To find the correct Terminal on this project's PCB please use the circuit diagrams and the official handbook as reference:
 - [ESP8266_circuit-diagram.pdf](ESP8266_circuit-diagram.pdf)
-- [ESP32-mini_circuit-diagram.pdf](ESP32-mini_circuit-diagram.pdf)
+- [ESP32-D1-mini_circuit-diagram.pdf](ESP32-D1-mini_circuit-diagram.pdf)
 - [TR10A147_E_ProMatic_3_DE.pdf](TR10A147_E_ProMatic_3_DE.pdf) (or see pictures below)
 
 
@@ -144,12 +144,12 @@ This file contains the basic configuration. You may change the values in the fir
 
 
 ### ESP32 D1 mini
-> **Firmware Template: [ESP32.yaml](ESP32.yaml)**
+> **Firmware Template: [ESP32-D1-mini.yaml](ESP32-D1-mini.yaml)**
 
 This file is basically a copy of the ESP8266 and is working the same way. Also the entities mentioned above are similar. However, the ESP32 has some considerable extras defined:
 - **Bluetooth Beacon**
   - can be used to identify the vehicle, on which the garage door should open.
-  - To discover bluetooth beacons, you might use the [discovery code](ESP32_beacon-discovery.yaml) first.
+  - To discover bluetooth beacons, you might use the [discovery code](ESP32-D1-mini_beacon-discovery.yaml) first.
 - **Bluetooth Proxy**
   - To proxy bluetooth signals (button press, BLE-sensors, etc.) to your Home Assistant instance.
 
