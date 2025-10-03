@@ -210,15 +210,39 @@ cover:
 
     open_action:
       - button.press: open_close_impulse
+      - delay: 1s
+      - if:
+          condition:
+            - lambda: 'return !(id(cover_entity).current_operation == CoverOperation::COVER_OPERATION_CLOSING);'
+          then:
+            - logger.log: "ERROR: Wrong Direction detected!"
+            - button.press: open_close_impulse #stop
+            - delay: 1s
+            - button.press: open_close_impulse #open
     open_duration: ${open_duration}
     open_endstop: is_opened
     open_sensor: motor_opening
 
     close_action:
       - button.press: open_close_impulse
+      - delay: 1s
+      - if:
+          condition:
+            - lambda: 'return !(id(cover_entity).current_operation == CoverOperation::COVER_OPERATION_OPENING);'
+          then:
+            - logger.log: "ERROR: Wrong Direction detected!"
+            - button.press: open_close_impulse #stop
+            - delay: 1s
+            - button.press: open_close_impulse #close
     close_duration: ${close_duration}
     close_endstop: is_closed
     close_sensor: motor_closing
 
     stop_action:
-      - button.press: open_close_impulse
+      - if:
+          condition:
+            - lambda: 'return !(id(cover_entity).current_operation == CoverOperation::COVER_OPERATION_IDLE);'
+          then:
+            - logger.log: "ERROR: Cover not moving, STOP action skipped!"
+          else: 
+            - button.press: open_close_impulse
