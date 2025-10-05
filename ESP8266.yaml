@@ -19,6 +19,8 @@ substitutions:
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
+  # includes:
+  #   - includes/cover_helpers.h
 
 esp8266:
   board: d1_mini
@@ -174,21 +176,49 @@ cover:
     name: ''
     device_class: garage
     icon: "mdi:garage"
+    id: cover_entity
     
     has_built_in_endstop: true
     direction_change_wait_time: 500ms
 
     open_action:
       - button.press: open_close_impulse
+      - delay: 3s     # OPENING/CLOSING state is getting active ~2.5s after the start-signal
+      # - lambda: 'log_cover_operation(id(cover_entity));'
+      - if:
+          condition:
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_CLOSING;'
+          then:
+            - logger.log: "ERROR: Wrong Direction detected!"
+            - button.press: open_close_impulse #stop
+            - delay: 1s
+            - button.press: open_close_impulse #open
     open_duration: ${open_duration}
     open_endstop: is_opened
     open_sensor: motor_opening
 
     close_action:
       - button.press: open_close_impulse
+      - delay: 3s     # OPENING/CLOSING state is getting active ~2.5s after the start-signal
+      # - lambda: 'log_cover_operation(id(cover_entity));'
+      - if:
+          condition:
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_OPENING;'
+          then:
+            - logger.log: "ERROR: Wrong Direction detected!"
+            - button.press: open_close_impulse #stop
+            - delay: 1s
+            - button.press: open_close_impulse #close
     close_duration: ${close_duration}
     close_endstop: is_closed
     close_sensor: motor_closing
 
     stop_action:
-      - button.press: open_close_impulse
+      # - lambda: 'log_cover_operation(id(cover_entity));'
+      - if:
+          condition:
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_IDLE;'
+          then:
+            - logger.log: "ERROR: Cover not moving, STOP action skipped!"
+          else: 
+            - button.press: open_close_impulse
