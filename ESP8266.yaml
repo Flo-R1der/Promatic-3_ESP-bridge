@@ -11,8 +11,8 @@ substitutions:
 
   # Set the open and close durations of your garage door here (decimal seconds allowed)
   # Measure the time your garage door needs for a full open/close cycle
-  open_duration: 16.5s
-  close_duration: 17.5s
+  open_duration: 13.8s
+  close_duration: 14.8s
 
 ##### Changes beyond this line may break the functionality #####
 
@@ -28,10 +28,8 @@ esp8266:
 status_led:
   pin: GPIO2
 
-# Enable logging
 logger:
 
-# Enable Home Assistant API
 api:
   encryption:
     key: ${api_encryption_key}
@@ -45,9 +43,8 @@ wifi:
   password: ${wifi_password}
 
   domain: ${local_domain}
-  use_address: 192.168.178.159
+  #use_address: 192.168.178.159
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: ${device_name}
     password: ${hotspot_password}
@@ -82,11 +79,10 @@ output:
 
 button:
   - platform: output
-    name: "Manual Trigger"
     id: open_close_impulse
-    disabled_by_default: true
     output: gpio_impulse
     duration: 300ms
+
 
 binary_sensor:
   - platform: status
@@ -99,7 +95,7 @@ binary_sensor:
         input: true
         pullup: true
       inverted: true
-    name: "External Button"
+    name: "Button"
     id: external_button
     disabled_by_default: true
     filters:
@@ -170,6 +166,7 @@ binary_sensor:
       # which turns off the motor_opening detection and puts the cover in a 
       # false idle state. The delayed_off: 3300ms time can compensate this behavior, 
       # but a partial "open" state will return wrong % values.
+
 
 cover:
   - platform: feedback
