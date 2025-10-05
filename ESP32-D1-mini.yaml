@@ -22,6 +22,8 @@ substitutions:
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
+  # includes:
+  #   - includes/cover_helpers.h
 
 esp32:
   board: wemos_d1_mini32
@@ -210,10 +212,11 @@ cover:
 
     open_action:
       - button.press: open_close_impulse
-      - delay: 1s
+      - delay: 3s     # OPENING/CLOSING state is getting active ~2.5s after the start-signal
+      # - lambda: 'log_cover_operation(id(cover_entity));'
       - if:
           condition:
-            - lambda: 'return !(id(cover_entity).current_operation == CoverOperation::COVER_OPERATION_CLOSING);'
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_CLOSING;'
           then:
             - logger.log: "ERROR: Wrong Direction detected!"
             - button.press: open_close_impulse #stop
@@ -225,10 +228,11 @@ cover:
 
     close_action:
       - button.press: open_close_impulse
-      - delay: 1s
+      - delay: 3s     # OPENING/CLOSING state is getting active ~2.5s after the start-signal
+      # - lambda: 'log_cover_operation(id(cover_entity));'
       - if:
           condition:
-            - lambda: 'return !(id(cover_entity).current_operation == CoverOperation::COVER_OPERATION_OPENING);'
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_OPENING;'
           then:
             - logger.log: "ERROR: Wrong Direction detected!"
             - button.press: open_close_impulse #stop
@@ -239,9 +243,10 @@ cover:
     close_sensor: motor_closing
 
     stop_action:
+      # - lambda: 'log_cover_operation(id(cover_entity));'
       - if:
           condition:
-            - lambda: 'return !(id(cover_entity).current_operation == CoverOperation::COVER_OPERATION_IDLE);'
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_IDLE;'
           then:
             - logger.log: "ERROR: Cover not moving, STOP action skipped!"
           else: 
