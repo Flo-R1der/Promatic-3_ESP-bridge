@@ -16,6 +16,7 @@ substitutions:
 
   # BLE Beacon settings
   ble_beacon_mac: !secret ble_beacon_mac_1
+  ble_timeout: 10s
 
 ##### Changes beyond this line may break the functionality #####
 
@@ -33,12 +34,9 @@ esp32:
 status_led:
   pin: GPIO2
 
-# Enable logging
 logger:
   baud_rate: 0
 
-
-# Enable Home Assistant API
 api:
   encryption:
     key: ${api_encryption_key}
@@ -92,11 +90,13 @@ output:
       number: GPIO26
     id: gpio_impulse
 
+
 button:
   - platform: output
     id: open_close_impulse
     output: gpio_impulse
     duration: 300ms
+
 
 binary_sensor:
   - platform: status
@@ -186,16 +186,17 @@ binary_sensor:
     mac_address: ${ble_beacon_mac}
     name: "BLE-Beacon Present"
     id: ble_beacon_presence
+    timeout: ${ble_timeout}
     on_press:
       if:
         condition:
-          - lambda: 'return !(id(cover_entity).position != COVER_OPEN);'
+          - lambda: 'return id(cover_entity).position*100 <= 1;' # works with+without endstop
         then:
           - cover.open: cover_entity
     on_release:
       if:
         condition:
-          - lambda: 'return !(id(cover_entity).position != COVER_CLOSED);'
+          - lambda: 'return id(cover_entity).position*100 >= 99;'# works with+without endstop
         then:
           - cover.close: cover_entity
 
