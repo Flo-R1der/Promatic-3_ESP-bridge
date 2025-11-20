@@ -162,18 +162,3 @@ This file is basically a copy of the ESP8266 and is working the same way. Also t
 
 <br>
 
-> [!IMPORTANT]  
-> While flashing the ESP32 D1 Mini I had some trouble. If you experience the same, here is what I did to overcome the issues:
-> 1. The ESP32 D1 mini does not have a BOOT button. To put the device in FLASH-Mode, **`GPIO0` must be connected to `GND`** (see [Pinout Reference](https://www.espboards.dev/esp32/d1-mini32/)).
-> 2. The [ESPHome Web Installer](https://web.esphome.io/) wasn't connecting to my device, but **the [Tasmota Web Installer](https://tasmota.github.io/install/) worked _sometimes_.**
-> 3. To ensure proper connection I installed [ESPHome on the local PC](https://esphome.io/guides/installing_esphome/). From there I was able to **[compile and flash](https://esphome.io/guides/getting_started_command_line/#first-uploading) from the shell** (it's easy, don't be scared).  
->    - Command: `esphome run garage.yaml` _(you may adapt the yaml-name)_
-> 4. When something seems to be corrupt an `erase-flash`-command from the [Espressif ESPTool](https://docs.espressif.com/projects/esptool/en/latest/esp32/) may help performing a **factory reset, if required** (see also [this Tutorial](https://randomnerdtutorials.com/esp32-erase-flash-memory/)).
-> 5. The more modern framework type `esp-idf` was causing boot-loops on the ESP32 D1 mini, whenever WiFi was enabled.
-> 6. Switching to  `arduino` framework was causing the firmware to be oversized, whenever any **bluetooth** component was included. Therefore, I had to disable the fallback-hotspot and captive portal, which removes the ability to update WiFi-password from the device hotspot...
-
-
-
-## Home Assistant Script + Automation
-
-
