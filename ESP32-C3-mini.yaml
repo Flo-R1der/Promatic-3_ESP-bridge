@@ -76,7 +76,7 @@ wifi:
     ssid: ${device_name}
     password: ${hotspot_password}
 
-  output_power: 14dB
+  output_power: 14dB   # higher power was causing instability on the ESP32-C3-mini
 
 
 captive_portal:
@@ -219,9 +219,19 @@ binary_sensor:
     on_press:
       then:
         - script.execute: led_working_status_1
+      if:
+        condition:
+          - lambda: 'return id(cover_entity).position*100 <= 1;' # works with+without endstop
+        then:
+          - cover.open: cover_entity
     on_release:
       then:
         - script.execute: led_system_status
+      if:
+        condition:
+          - lambda: 'return id(cover_entity).position*100 >= 99;' # works with+without endstop
+        then:
+          - cover.close: cover_entity
 
 
 
