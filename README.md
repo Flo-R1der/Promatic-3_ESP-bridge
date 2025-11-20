@@ -5,7 +5,7 @@ This project is made to integrate the Hörmann Promatic 3 garage door drive unit
 - ✅ Detects `opening` and `closing` (motor running) as well as `open`/`close` (end position)
 - ✅ Does support partially opened states, like `10%` for air ventilation (with auto-stop)
 - ✅ can be linked with a Beacon device for zero-touch offline opening
-- ✅ comes with a script blueprint to overcome the one-touch control and gain more specific control
+- ✅ is detecting wrong directions and switching the direction if required to gain more specific control, beside the one-touch control
 - ✅ highly customizable
 - ⚠️ requires PCB assembly and soldering
 - ⚠️ requires ESPHome to flash the ESP firmware
@@ -162,3 +162,60 @@ This file is basically a copy of the ESP8266 and is working the same way. Also t
 
 <br>
 
+---
+
+## Home Assistant Automation
+
+> [!NOTE]  
+> This repository aims to provide the ESP device and its directly related elements (circuit diagram, PCB, ESPHome-yaml, ...). Therefore, this section here is only for information, but without further support.
+
+> [!TIP]  
+> If you use an **ESP32 with Bluetooth Beacon**, no Home Assistant connection or automation is required. The arrival/leave of the Bluetooth Beacon will trigger an open/close of the cover entity internal on the ESP32.
+
+Here is a nice Automation I'm using in combination with the ESP8266.  
+**Prerequisite**: The [Proximity Sensors](https://www.home-assistant.io/integrations/proximity/) is providing a distance between your Phone/Car and your Garage/Home-Zone, which can be used as a trigger. In my case I was also using the [Android Auto Sensor](https://companion.home-assistant.io/docs/core/sensors/#android-auto) from my mobile device to distinguish, if I'm sitting in my car or not.
+
+````ymal
+alias: Garage links
+description: ""
+triggers:
+  - trigger: numeric_state
+    entity_id:
+      - sensor.home_entfernung_von_florian
+    below: 20
+    id: ARRIVING
+  - trigger: numeric_state
+    entity_id:
+      - sensor.home_entfernung_von_florian
+    above: 100
+    id: LEAVING
+conditions:
+  - condition: state
+    entity_id: binary_sensor.xiaomi_12x_android_auto
+    state: "on"
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - ARRIVING
+          - condition: state
+            state: closed
+            entity_id: cover.esp_promatic3_bridge1_garage_links
+        sequence:
+          - action: cover.open_cover
+            target:
+              entity_id: cover.esp_promatic3_bridge1_garage_links
+      - conditions:
+          - condition: trigger
+            id:
+              - LEAVING
+          - condition: state
+            state: open
+            entity_id: cover.esp_promatic3_bridge1_garage_links
+        sequence:
+          - action: cover.close_cover
+            target:
+              entity_id: cover.esp_promatic3_bridge1_garage_links
+mode: single
+````
