@@ -29,7 +29,7 @@ This project is made to integrate the Hörmann Promatic 3 garage door drive unit
 | 1    | J2    | 4 leg **screw terminal** |  |
 | 1    | J3    | 3 leg **screw terminal** |  |
 
- A housing is also recommended since the PCB does not fit in the Promatic 3 housing. As reference: I'm using these [project boxes](https://www.amazon.de/dp/B0BWLW941S)
+ A housing is also recommended since the PCB does not fit in the Promatic 3 housing. As reference: I'm using these [project boxes](https://www.amazon.de/dp/B0BWLW941S).
 
 
 ## Option 1: ESP8266 D1 mini
@@ -58,8 +58,6 @@ Grid PCB: 70 x 50 mm / 24 x 18 holes / resistors vertical to save space
 
 
 ## Option 2: ESP32 C3 mini
-> I tested the ESP32 D1 Mini first, but it was causing a lot of trouble. Therefore, it is now **marked as legacy**. If you still want to use it take, look into the [legacy-folder](legacy/).
-
 <details>
 <summary>For extended functionalities the ESP32 is the better option</summary>
 
@@ -72,6 +70,8 @@ Grid PCB: 70 x 50 mm / 24 x 18 holes / resistors vertical to save space
 If you like to order the PCB shown above, feel free to use the already exported production files. Or implement changes using **[fritzing](https://fritzing.org/download)** (check the [LOLIN ESP32 C3 Mini Pinout Reference](https://www.espboards.dev/esp32/lolin-c3-mini/)!):
 - **PCB-Design**: [ESP32-C3-mini_extended-gerber.zip](ESP32-C3-mini_extended-gerber.zip) (78,7 x 54,6mm)
 - **Project File**: [ESP32-C3-mini.fzz](ESP32-C3-mini.fzz)
+
+> I tested the ESP32 D1 Mini first, but it was causing a lot of trouble. Therefore, it is now **marked as legacy**. If you still want to use it take, look into the [legacy-folder](legacy/).
 
 ### Results (Prototype)
 
@@ -144,8 +144,6 @@ This file contains the basic configuration. You may change the values in the fir
 
 
 ### ESP32 C3 mini
-> I tested the ESP32 D1 Mini first, but it was causing a lot of trouble. Therefore, it is now **marked as legacy**. If you still want to use it take, look into the [legacy-folder](legacy/).
-
 > **Firmware Template: [ESP32-C3-mini.yaml](ESP32-C3-mini.yaml)**
 
 > [!NOTE]
@@ -155,9 +153,11 @@ This file contains the basic configuration. You may change the values in the fir
 This file is basically a copy of the ESP8266 and is working the same way. Also the entities mentioned above are similar. However, the ESP32 has some considerable extras defined:
 - **Bluetooth Beacon**
   - can be used to identify the vehicle, on which the garage door should open.
-  - To discover bluetooth beacons, you might use the [discovery code](ESP32_C3-mini_beacon-discovery.yaml) first.
+  - To discover bluetooth beacons, you might use the [discovery code](ESP32-C3-mini_beacon-discovery.yaml) first.
 - **Bluetooth Proxy**
   - To proxy bluetooth signals (button press, BLE-sensors, etc.) to your Home Assistant instance.
+
+> I tested the ESP32 D1 Mini first, but it was causing a lot of trouble. Therefore, it is now **marked as legacy**. If you still want to use it take, look into the [legacy-folder](legacy/).
 
 
 <br>
