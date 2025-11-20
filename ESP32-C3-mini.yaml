@@ -1,0 +1,279 @@
+#===== You can edit your configuration in this 'substitution' section =====#
+substitutions:
+  device_name: "garage-rechts"  # only lowercase, numbers, - and _ allowed!
+  friendly_name: "Garage rechts"
+  wifi_ssid: !secret wifi_ssid
+  wifi_password: !secret wifi_password
+  local_domain: ".fritz.box"
+  hotspot_password: !secret hotspot_password
+  ota_password: !secret ota_password
+  api_encryption_key: !secret api_encryption
+
+  # Set the open and close durations of your garage door here (decimal seconds allowed)
+  # Measure the time your garage door needs for a full open/close cycle
+  open_duration: 13.8s
+  close_duration: 14.8s
+
+  # BLE Beacon settings
+  ble_beacon_mac: !secret ble_beacon_mac_1
+  ble_timeout: 60s
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: system_status_led             # DO NOT CHANGE
+    pin: GPIO7                        # check your board
+    rgb_order: GRB                    # check your board
+    num_leds: 1
+    chipset: ws2812                   # check your board
+    name: "onboard LED"
+    disabled_by_default: true
+    default_transition_length: 200ms
+    icon: mdi:led-outline
+    restore_mode: ALWAYS_OFF
+    effects:
+      - pulse:
+          name: "Slow Pulse"          # REQUIRED
+          update_interval: 2s         # can be adjusted
+      - pulse:
+          name: "Fast Pulse"          # REQUIRED
+          update_interval: 500ms      # can be adjusted
+
+packages:
+  rgb_status_led: 
+    url: https://github.com/Flo-R1der/ESPHome_RGB-Status-LED_Package
+    file: status_led_package.yaml
+
+##### Changes beyond this line may break the functionality #####
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: lolin_c3_mini
+  framework:
+    type: esp-idf
+
+logger:
+  baud_rate: 0
+
+api:
+  encryption:
+    key: ${api_encryption_key}
+
+ota:
+  - platform: esphome
+    password: ${ota_password}
+
+wifi:
+  ssid: ${wifi_ssid}
+  password: ${wifi_password}
+
+  domain: ${local_domain}
+  use_address: 192.168.178.180
+  
+  ap:
+    ssid: ${device_name}
+    password: ${hotspot_password}
+
+  output_power: 14dB
+
+
+captive_portal:
+  
+
+esp32_ble_tracker:
+
+
+sensor:
+  - platform: wifi_signal # Reports the WiFi signal strength/RSSI in dB
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+    icon: mdi:wifi
+
+  - platform: copy # Reports the WiFi signal strength in %
+    source_id: wifi_signal_db
+    name: "WiFi Signal %"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+    device_class: ""
+    icon: mdi:wifi
+
+
+  - platform: ble_rssi
+    mac_address: ${ble_beacon_mac}
+    name: "BLE-Beacon RSSI"
+    id: ble_beacon_rssi
+    disabled_by_default: true
+    filters:
+      - throttle: 30s   # throttle state publish to home assistant / prevent updates in 300ms intervals 
+
+
+output:
+  - platform: gpio
+    pin: 
+      number: GPIO5
+    id: gpio_impulse
+
+
+button:
+  - platform: output
+    id: open_close_impulse
+    output: gpio_impulse
+    duration: 300ms
+
+
+binary_sensor:
+  - platform: status
+    name: "Status"
+
+  - platform: gpio
+    pin:
+      number: GPIO10
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    name: "Button"
+    id: external_button
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+    on_press:
+      then:
+        - button.press: open_close_impulse
+
+  - platform: gpio
+    pin:
+      number: GPIO6
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: is_opened
+    name: "open"
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+
+  - platform: gpio
+    pin:
+      number: GPIO1
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    id: is_closed
+    name: "closed"
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode:
+        input: true
+        pullup: true
+    id: motor_opening
+    name: "opening"
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+      # the voltage of the motor drops at the end to slow down the garage door
+      # which turns off the motor_opening detection and puts the cover in a 
+      # false idle state. The delayed_off: 3300ms time can compensate this behavior, 
+      # but a partial "open" state will return wrong % values.
+
+  - platform: gpio
+    pin:
+      number: GPIO4
+      mode:
+        input: true
+        pullup: true
+    id: motor_closing
+    name: "closing"
+    disabled_by_default: true
+    filters:
+      - delayed_on: 50ms
+      - delayed_off: 50ms
+      # the voltage of the motor drops at the end to slow down the garage door
+      # which turns off the motor_opening detection and puts the cover in a 
+      # false idle state. The delayed_off: 3300ms time can compensate this behavior, 
+      # but a partial "open" state will return wrong % values.
+
+
+  - platform: ble_presence
+    mac_address: ${ble_beacon_mac}
+    name: "BLE-Beacon Present"
+    id: ble_beacon_presence
+    timeout: ${ble_timeout}
+    on_press:
+      then:
+        - script.execute: led_working_status_1
+    on_release:
+      then:
+        - script.execute: led_system_status
+
+
+
+cover:
+  - platform: feedback
+    name: ''
+    device_class: garage
+    icon: "mdi:garage"
+    id: cover_entity
+    
+    has_built_in_endstop: true
+    direction_change_wait_time: 500ms
+
+    open_action:
+      - button.press: open_close_impulse
+      - delay: 3s     # OPENING/CLOSING state is getting active ~2.5s after the start-signal
+      # - lambda: 'log_cover_operation(id(cover_entity));'
+      - if:
+          condition:
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_CLOSING;'
+          then:
+            - logger.log: "ERROR: Wrong Direction detected!"
+            - button.press: open_close_impulse #stop
+            - delay: 1s
+            - button.press: open_close_impulse #open
+    open_duration: ${open_duration}
+    open_endstop: is_opened
+    open_sensor: motor_opening
+
+    close_action:
+      - button.press: open_close_impulse
+      - delay: 3s     # OPENING/CLOSING state is getting active ~2.5s after the start-signal
+      # - lambda: 'log_cover_operation(id(cover_entity));'
+      - if:
+          condition:
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_OPENING;'
+          then:
+            - logger.log: "ERROR: Wrong Direction detected!"
+            - button.press: open_close_impulse #stop
+            - delay: 1s
+            - button.press: open_close_impulse #close
+    close_duration: ${close_duration}
+    close_endstop: is_closed
+    close_sensor: motor_closing
+
+    stop_action:
+      # - lambda: 'log_cover_operation(id(cover_entity));'
+      - if:
+          condition:
+            - lambda: 'return id(cover_entity).current_operation == COVER_OPERATION_IDLE;'
+          then:
+            - logger.log: "ERROR: Cover not moving, STOP action skipped!"
+          else: 
+            - button.press: open_close_impulse
+
