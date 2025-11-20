@@ -18,7 +18,7 @@ This project is made to integrate the Hörmann Promatic 3 garage door drive unit
 | Qty. | Ref.  | Part | Notes |
 | :--: | :---: | :--- | :---- |
 | 1    | A1    | **MP1584** 3,3V buck regulator | provides 3,3V stabilized; Input: 4,5–28 V |
-| 1    | A2    | **ESP8266** D1 Mini or **ESP32** mini | use ESP32 version for BLE Support |
+| 1    | A2    | **ESP8266** D1 Mini or **ESP32** C3 Mini | use ESP32 version for BLE Support |
 | 4    | U1-U4 | **PC819** optocoupler | for 24V/3,3V separation |
 | 2    | R1-R2 | **2,2kΩ ½W** resistor | series resistor optocoupler LED at 24V |
 | 2    | R3-R4 | **330Ω ¼W** resistor | series resistor optocoupler LED at 3,3V |
@@ -57,28 +57,28 @@ Grid PCB: 70 x 50 mm / 24 x 18 holes / resistors vertical to save space
 </details>
 
 
-## Option 2: ESP32 D1 mini
+## Option 2: ESP32 C3 mini
+> I tested the ESP32 D1 Mini first, but it was causing a lot of trouble. Therefore, it is now **marked as legacy**. If you still want to use it take, look into the [legacy-folder](legacy/).
+
 <details>
 <summary>For extended functionalities the ESP32 is the better option</summary>
 
-> **WARNING**: While flashing the ESP32 D1 Mini I had some trouble. Please read the information below in the [ESPHome Firmware](#esphome-firmware)-Section.
-
 ### Circuit Diagram
-![ESP32-D1-mini circuit diagram](images/ESP32-D1-mini_circuit-diagram.svg)
+![ESP32-C3-mini circuit diagram](images/ESP32-C3-mini_circuit-diagram.svg)
 
 ### PCB-Design
-<img src="images\ESP32-D1-mini_PCB.png" width=500px>
+<img src="images\ESP32-C3-mini_PCB.png" width=500px>
 
-If you like to order the PCB shown above, feel free to use the already exported production files. Or implement changes using **[fritzing](https://fritzing.org/download)** (check the [ESP32-D1-mini Pinout Reference](https://www.espboards.dev/esp32/d1-mini32/)!):
-- **PCB-Design**: [ESP32-D1-mini_extended-gerber.zip](ESP32-D1-mini_extended-gerber.zip) (78,7 x 54,6mm)
-- **Project File**: [ESP32-D1-mini.fzz](ESP32-D1-mini.fzz)
+If you like to order the PCB shown above, feel free to use the already exported production files. Or implement changes using **[fritzing](https://fritzing.org/download)** (check the [LOLIN ESP32 C3 Mini Pinout Reference](https://www.espboards.dev/esp32/lolin-c3-mini/)!):
+- **PCB-Design**: [ESP32-C3-mini_extended-gerber.zip](ESP32-C3-mini_extended-gerber.zip) (78,7 x 54,6mm)
+- **Project File**: [ESP32-C3-mini.fzz](ESP32-C3-mini.fzz)
 
 ### Results (Prototype)
 
-I ordered a PCB and tried to do the soldering. Unfortunately there were some issues, that are resolved now in the ESP8266 and ESP32 PCB files (see commit [4a13bd1](../../commit/4a13bd1397be6c67168064e2b9723a02679394e2) and [b1b8725](../../commit/b1b872543b13843ac204b23dd64338c8f80fe5ec) for details)
+> For the ESP32-D1 mini ([legacy](legacy/)) I ordered a PCB and tried to do the soldering. Unfortunately there were some issues, that are resolved now in all PCB files (see commit [4a13bd1](../../commit/4a13bd1397be6c67168064e2b9723a02679394e2) and [b1b8725](../../commit/b1b872543b13843ac204b23dd64338c8f80fe5ec) for details)
 
-<img src="images\ESP32-D1-mini_prototype-PCB_top.jpg" width=400px>
-<img src="images\ESP32-D1-mini_prototype-PCB_bottom.jpg" width=400px>
+<img src="legacy\ESP32-D1-mini_prototype-PCB_top.jpg" width=400px>
+<img src="legacy\ESP32-D1-mini_prototype-PCB_bottom.jpg" width=400px>
 
 </details>
 
@@ -102,7 +102,7 @@ I ordered a PCB and tried to do the soldering. Unfortunately there were some iss
 
 To find the correct Terminal on this project's PCB please use the circuit diagrams and the official handbook as reference:
 - [ESP8266_circuit-diagram.pdf](ESP8266_circuit-diagram.pdf)
-- [ESP32-D1-mini_circuit-diagram.pdf](ESP32-D1-mini_circuit-diagram.pdf)
+- [ESP32-C3-mini_circuit-diagram.pdf](ESP32-C3-mini_circuit-diagram.pdf)
 - [TR10A147_E_ProMatic_3_DE.pdf](TR10A147_E_ProMatic_3_DE.pdf) (or see pictures below)
 
 
@@ -143,13 +143,19 @@ This file contains the basic configuration. You may change the values in the fir
 - **Diagnostics** (Connection Status, WiFi Signal)
 
 
-### ESP32 D1 mini
-> **Firmware Template: [ESP32-D1-mini.yaml](ESP32-D1-mini.yaml)**
+### ESP32 C3 mini
+> I tested the ESP32 D1 Mini first, but it was causing a lot of trouble. Therefore, it is now **marked as legacy**. If you still want to use it take, look into the [legacy-folder](legacy/).
+
+> **Firmware Template: [ESP32-C3-mini.yaml](ESP32-C3-mini.yaml)**
+
+> [!NOTE]
+> The board I used is the [LOLIN ESP32 C3 Mini](https://www.espboards.dev/esp32/lolin-c3-mini/) which has a RGB onboard LED. These RGB-LEDs are not supported by the [ESPHome Status-LED](https://esphome.io/components/light/status_led/). So I wrote a quick package, utilizing the onboard RGB LED to display the status of the board. Details can be found in my [ESPHome RGB Status LED Package](https://github.com/Flo-R1der/ESPHome_RGB-Status-LED_Package).
+
 
 This file is basically a copy of the ESP8266 and is working the same way. Also the entities mentioned above are similar. However, the ESP32 has some considerable extras defined:
 - **Bluetooth Beacon**
   - can be used to identify the vehicle, on which the garage door should open.
-  - To discover bluetooth beacons, you might use the [discovery code](ESP32-D1-mini_beacon-discovery.yaml) first.
+  - To discover bluetooth beacons, you might use the [discovery code](ESP32_C3-mini_beacon-discovery.yaml) first.
 - **Bluetooth Proxy**
   - To proxy bluetooth signals (button press, BLE-sensors, etc.) to your Home Assistant instance.
 

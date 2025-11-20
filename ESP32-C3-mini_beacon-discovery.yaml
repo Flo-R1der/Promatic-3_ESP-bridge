@@ -24,9 +24,9 @@ esphome:
   friendly_name: ${friendly_name}
 
 esp32:
-  board: wemos_d1_mini32
+  board: lolin_c3_mini
   framework:
-    type: arduino
+    type: esp-idf
 
 status_led:
   pin: GPIO2
