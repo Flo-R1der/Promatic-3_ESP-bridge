@@ -2,3 +2,8 @@
 *secret*
 *.log*
 .vscode
+*.bin
+
+# excluding FOLDERS
+\backup
+\tests
