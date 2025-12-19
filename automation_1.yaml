@@ -1,0 +1,42 @@
+alias: Garage links
+description: ""
+triggers:
+  - trigger: numeric_state
+    entity_id:
+      - sensor.home_entfernung_von_florian
+    below: 20
+    id: ARRIVING
+  - trigger: numeric_state
+    entity_id:
+      - sensor.home_entfernung_von_florian
+    above: 100
+    id: LEAVING
+conditions:
+  - condition: state
+    entity_id: binary_sensor.xiaomi_12x_android_auto
+    state: "on"
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - ARRIVING
+          - condition: state
+            state: closed
+            entity_id: cover.esp_promatic3_bridge1_garage_links
+        sequence:
+          - action: cover.open_cover
+            target:
+              entity_id: cover.esp_promatic3_bridge1_garage_links
+      - conditions:
+          - condition: trigger
+            id:
+              - LEAVING
+          - condition: state
+            state: open
+            entity_id: cover.esp_promatic3_bridge1_garage_links
+        sequence:
+          - action: cover.close_cover
+            target:
+              entity_id: cover.esp_promatic3_bridge1_garage_links
+mode: single

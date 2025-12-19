@@ -152,7 +152,7 @@ This file contains the basic configuration. You may change the values in the fir
 
 This file is basically a copy of the ESP8266 and is working the same way. Also the entities mentioned above are similar. However, the ESP32 has some considerable extras defined:
 - **Bluetooth Beacon**
-  - can be used to identify the vehicle, on which the garage door should open.
+  - can be used to identify the vehicle or occupancy of the garage.
   - To discover bluetooth beacons, you might use the [discovery code](ESP32-C3-mini_beacon-discovery.yaml) first.
 - **Bluetooth Proxy**
   - To proxy bluetooth signals (button press, BLE-sensors, etc.) to your Home Assistant instance.
@@ -169,53 +169,23 @@ This file is basically a copy of the ESP8266 and is working the same way. Also t
 > [!NOTE]  
 > This repository aims to provide the ESP device and its directly related elements (circuit diagram, PCB, ESPHome-yaml, ...). Therefore, this section here is only for information, but without further support.
 
-> [!TIP]  
-> If you use an **ESP32 with Bluetooth Beacon**, no Home Assistant connection or automation is required. The arrival/leave of the Bluetooth Beacon will trigger an open/close of the cover entity internal on the ESP32.
+**Prerequisite**:   
+Make sure, the **Background Location** is enabled on your phone and [set up correct](images\background-location.jpg).
 
-Here is a nice Automation I'm using in combination with the ESP8266.  
-**Prerequisite**: The [Proximity Sensors](https://www.home-assistant.io/integrations/proximity/) is providing a distance between your Phone/Car and your Garage/Home-Zone, which can be used as a trigger. In my case I was also using the [Android Auto Sensor](https://companion.home-assistant.io/docs/core/sensors/#android-auto) from my mobile device to distinguish, if I'm sitting in my car or not.
+<br>
 
-````ymal
-alias: Garage links
-description: ""
-triggers:
-  - trigger: numeric_state
-    entity_id:
-      - sensor.home_entfernung_von_florian
-    below: 20
-    id: ARRIVING
-  - trigger: numeric_state
-    entity_id:
-      - sensor.home_entfernung_von_florian
-    above: 100
-    id: LEAVING
-conditions:
-  - condition: state
-    entity_id: binary_sensor.xiaomi_12x_android_auto
-    state: "on"
-actions:
-  - choose:
-      - conditions:
-          - condition: trigger
-            id:
-              - ARRIVING
-          - condition: state
-            state: closed
-            entity_id: cover.esp_promatic3_bridge1_garage_links
-        sequence:
-          - action: cover.open_cover
-            target:
-              entity_id: cover.esp_promatic3_bridge1_garage_links
-      - conditions:
-          - condition: trigger
-            id:
-              - LEAVING
-          - condition: state
-            state: open
-            entity_id: cover.esp_promatic3_bridge1_garage_links
-        sequence:
-          - action: cover.close_cover
-            target:
-              entity_id: cover.esp_promatic3_bridge1_garage_links
-mode: single
-````
+Here are the two automation I'm using in combination with the ESP8266 and ESP32:
+- **Trigger** is always the distance to the Garage/Home-Zone from the [**Proximity Sensors**](https://www.home-assistant.io/integrations/proximity/):
+   - below: 20 = ARRIVING | above: 100 = LEAVING
+- **Condition** is important to filter, weather you are in your car and not, using taxi/bus/bicycle/feet:
+   - _Variant 1_: Enable the [**Android Auto Sensor**](https://companion.home-assistant.io/docs/core/sensors/#android-auto) and check if connected or not.
+   - _Variant 2_: Utilize the [**Bluetooth Sensors**](https://companion.home-assistant.io/docs/core/sensors/#bluetooth-sensors) to look for a specific connected Bluetooth Device.
+   - _BLE Option_: With the [ESP32 **Bluetooth Low Energy Tracker**](https://esphome.io/components/esp32_ble_tracker/) you can detect, if the garage is already occupied.
+- **Action** simply open or closes the garage:
+   - if ARRIVING and garage closed: `cover.open_cover`
+   - if LEAVING and garage opened: `cover.close_cover`
+
+
+Here's the YAML-Code for my two examples:
+- [Automation 1](automation_1.yaml): using Condition _Variant 1_
+- [Automation 2](automation_2.yaml): using Condition _Variant 2_ and the _BLE Option_

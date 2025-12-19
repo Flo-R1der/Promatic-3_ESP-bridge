@@ -1,0 +1,63 @@
+alias: Garage rechts
+description: ""
+triggers:
+  - trigger: numeric_state
+    entity_id:
+      - sensor.home_entfernung_von_wifey
+    below: 20
+    id: ARRIVING
+  - trigger: numeric_state
+    entity_id:
+      - sensor.home_entfernung_von_wifey
+    above: 100
+    id: LEAVING
+conditions:
+  - condition: template
+    value_template: >-
+      {% set sensor = "sensor.xiaomi_13_bluetooth_connection" %}
+      {% set device_lookup = ["AA:BB:CC:DD:EE:FF", "01:23:45:67:89:AB"] %}
+
+      {% set connected_devices = state_attr(sensor, 'connected_paired_devices') %}
+      {% set device = namespace(found=false) %}
+      {% for connected_device in connected_devices %}
+        {% for lookup in device_lookup %}
+          {% if lookup in connected_device %}
+            {% set device.found = true %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+
+      {{ device.found }}
+    alias: Look for connected Bluetooth devices
+  - condition: state
+    entity_id: binary_sensor.garage_rechts_ble_beacon_present
+    state:
+      - "off"
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - ARRIVING
+          - condition: state
+            state:
+              - closed
+            entity_id: cover.garage_rechts
+        sequence:
+          - action: cover.open_cover
+            target:
+              entity_id: cover.garage_rechts
+            data: {}
+      - conditions:
+          - condition: trigger
+            id:
+              - LEAVING
+          - condition: state
+            state: open
+            entity_id: cover.garage_rechts
+        sequence:
+          - action: cover.close_cover
+            target:
+              entity_id: cover.garage_rechts
+            data: {}
+mode: single
