@@ -11,8 +11,15 @@ triggers:
       - sensor.home_entfernung_von_wifey
     above: 100
     id: LEAVING
+  - trigger: state
+    entity_id:
+      - binary_sensor.garage_rechts_ble_beacon_present
+    to:
+      - "off"
+    id: LEAVING_BLE
 conditions:
-  - condition: template
+  - alias: Look for connected Bluetooth devices
+    condition: template
     value_template: >-
       {% set sensor = "sensor.xiaomi_13_bluetooth_connection" %}
       {% set device_lookup = ["AA:BB:CC:DD:EE:FF", "01:23:45:67:89:AB"] %}
@@ -28,7 +35,6 @@ conditions:
       {% endfor %}
 
       {{ device.found }}
-    alias: Look for connected Bluetooth devices
   - condition: state
     entity_id: binary_sensor.garage_rechts_ble_beacon_present
     state:
@@ -52,6 +58,7 @@ actions:
           - condition: trigger
             id:
               - LEAVING
+              - LEAVING_BLE
           - condition: state
             state: open
             entity_id: cover.garage_rechts
